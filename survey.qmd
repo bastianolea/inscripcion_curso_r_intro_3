@@ -1,0 +1,296 @@
+---
+# General Settings
+title: Inscripción
+format: html
+echo: false
+warning: false
+
+# Theme Settings
+theme: custom.scss
+barposition: top
+barcolor: "#8655AA"
+linkcolor: "#8655AA"
+
+# Survey Settings
+use-cookies: false
+auto-scroll: true
+rate-survey: false
+system-language: es
+highlight-unanswered: true
+highlight-color: purple
+capture-metadata: false
+all-questions-required: true
+
+system-messages:
+  cancel: Cancelar
+  previous: Anterior
+  next: Siguiente
+  exit: Salir
+  choose-option: Elige una opción
+
+---
+
+```{r}
+library(surveydown)
+```
+
+::: {.sd_page id=welcome}
+
+# Inscripción a curso gratuito: _Introducción al análisis de datos con R, tercera versión_
+
+**Curso online introductorio de programación dirigido a estudiantes o profesionales de las ciencias sociales**
+
+Más información sobre el curso [en este enlace.](https://bastianolea.rbind.io/blog/curso_r_intro_3/)
+
+Rellena los datos para inscribirte al curso. 
+
+El curso tiene **cupos limitados**, y se aplicarán criterios de inclusión para la participación de grupos minoritarios (mujeres, disidencias de sexo y género, personas con discapacidad). Por lo tanto, **se te confirmará por correo si es que cuentas con un cupo.**
+
+Al inscribirte al curso aceptas el [código de conducta](https://bastianolea.rbind.io/code-of-conduct/).
+
+```{r}
+sd_nav(page_next = 'page_1', label_next = "Inscribirse", show_prev = FALSE)
+```
+
+:::
+
+:::  {.sd_page id=page_1}
+
+### Preguntas de caracterización
+
+```{r}
+sd_question(
+  type  = "text",
+  id    = "nombre",
+  placeholder = "Nombre y apellido",
+  label = "Nombre y apellido"
+)
+```
+
+
+```{r}
+sd_question(
+  type  = "numeric",
+  id    = "edad",
+  placeholder = "Edad",
+  label = "Edad"
+)
+```
+
+
+```{r}
+sd_question(
+  type  = 'mc',
+  id    = 'genero',
+  label = "Género",
+  option = c("Femenino", 
+             "No binario", 
+             "Masculino", 
+             "Queer/agénero/otro",
+             "Prefiero no decirlo")
+)
+```
+
+```{r}
+sd_question(
+  type  = 'mc',
+  id    = 'lgbt',
+  # label = "¿Tienes una identidad de género, orientación sexual, o perteneces a una disidencia sexual o de género dentro del espectro LGBTIQ+?",
+  label = "¿Te identificas con alguna orientación sexual, condición, o identidad de género dentro del espectro LGBTIQ+ (lesbianas, gays, bisexuales, trans, intersex, queer, asexuales, entre otros)?",
+  option = c("Sí", "No", "Prefiero no decirlo")
+)
+```
+
+
+
+```{r}
+sd_question(
+  type  = 'mc',
+  id    = 'trans',
+  label = "¿Eres una persona transgénero? (Transicionaste social y/o médicamente a un género distinto al que naciste)",
+  option = c("Sí", "No", "Prefiero no decirlo")
+)
+```
+
+
+```{r}
+sd_question(
+  type  = 'select',
+  id    = 'pais',
+  label = "¿En qué país vives?",
+  direction = "vertical", 
+  placeholder = "País",
+  selected = "Chile", 
+  option = c(
+    "Argentina",
+    "Bolivia",
+    "Brasil",
+    "Chile",
+    "Colombia",
+    "Costa Rica",
+    "Cuba",
+    "Ecuador",
+    "El Salvador",
+    "Guatemala",
+    "Honduras",
+    "México",
+    "Nicaragua",
+    "Panamá",
+    "Paraguay",
+    "Perú",
+    "Puerto Rico",
+    "República Dominicana",
+    "Uruguay",
+    "Venezuela",
+    "España",
+    "Otro"
+    )
+)
+```
+
+
+```{r}
+sd_question(
+  type  = 'mc',
+  id    = 'disca',
+  label = "¿Te encuentras en situación de discapacidad?",
+  option = c("Sí, con credencial o pensión de invalidez",
+             "Sí, sin credencial o pensión de invalidez",
+             "No",
+             "Prefiero no decirlo")
+)
+```
+
+
+
+```{r}
+sd_nav(label_next = "Siguiente", show_prev = TRUE)
+```
+
+:::
+
+::: {.sd_page id=page2}
+
+### Preguntas sobre conocimientos
+
+```{r}
+sd_question(
+  type  = 'mc_buttons',
+  id    = 'educacion',
+  label = "¿Cuál es tu nivel educacional?",
+  option = c(
+    "Estudiante de educación universitaria",
+    "Educación universitaria completa",
+    "Estudiante de magíster",
+    "Magíster",
+    "Estudiante de doctorado",
+    "Doctorado"
+  )
+)
+```
+
+```{r}
+sd_question(
+  type  = 'mc_buttons',
+  id    = 'areas',
+  label = "¿A qué carrera o disciplina perteneces? (Elige la principal)",
+  option = c(
+    "Sociología",
+    "Antropología",
+    "Ciencia Política",
+    "Geografía",
+    "Historia",
+    "Derecho",
+    "Economía",
+    "Literatura",
+    "Filosofía",
+    "Psicología",
+    "Trabajo Social",
+    "Educación",
+    "Comunicación",
+    "Artes",
+    "Otra de ciencias sociales",
+    "Otra de humanidades",
+    "Otra que no es de ciencias sociales ni humanidades"
+  )
+)
+```
+
+```{r}
+sd_question(
+  type  = 'mc_buttons',
+  id    = 'nivel_programacion',
+  label = "¿Manejas algún lenguaje de programación?",
+  option = c(
+    "Sí, más de uno",
+    "Sí, uno",
+    "No"
+  )
+)
+```
+
+
+```{r}
+sd_question(
+  type  = 'mc_buttons',
+  id    = 'nivel_r',
+  label = "¿Cuál es tu nivel de conocimientos de R?",
+  option = c(
+    "Ninguno",
+    "Principiante",
+    "Intermedio",
+    "Avanzado",
+    "Experto",
+    "Lo vi en la universidad pero no entendí nada"
+  )
+)
+```
+
+```{r}
+sd_nav(label_next = "Siguiente", show_prev = TRUE)
+```
+
+:::
+
+::: {.sd_page id=page3}
+
+### Contacto
+
+Deja un correo electrónico para comunicarte si quedaste en el curso. No se usará este correo para otros fines.
+
+```{r}
+sd_question(
+  type  = "text",
+  id    = "correo",
+  placeholder = "tu@correo.com",
+  label = "Correo electrónico"
+)
+```
+
+Revisa que el correo esté bien escrito, o no te llegará tu cupo!
+
+Luego de las inscripciones y asignación de cupos, se confirmará a este correo si cuentas con un cupo para participar.
+
+```{r}
+sd_nav(label_next = "Terminar", show_prev = TRUE)
+```
+
+:::
+
+::: {.sd_page id=end}
+
+## Gracias
+
+¡Muchas gracias por tu interés! Cualquier cosa puedes [contactarme](https://bastianolea.rbind.io/contacto/).
+
+
+```{r}
+sd_close()
+```
+
+<br>
+<br>
+
+Esta encuesta fue hecha en R con [`{surveydown}`](https://bastianolea.rbind.io/blog/surveydown_encuestas/)
+
+:::

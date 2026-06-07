@@ -1,0 +1,56 @@
+# ! JUST READ - don't change the content of this file
+# All survey configuration settings with final resolved values
+
+theme-settings:
+  theme: custom.scss
+  barposition: top
+  barcolor: '#8655AA'
+  footer-left: ''
+  footer-center: ''
+  footer-right: ''
+
+survey-settings:
+  show-previous: no
+  use-cookies: no
+  auto-scroll: yes
+  rate-survey: no
+  all-questions-required: yes
+  start-page: welcome
+  system-language: es
+  highlight-unanswered: yes
+  highlight-color: purple
+  capture-metadata: no
+  required-questions:
+  - nombre
+  - edad
+  - genero
+  - lgbt
+  - trans
+  - pais
+  - disca
+  - educacion
+  - areas
+  - nivel_programacion
+  - nivel_r
+  - correo
+
+system-messages:
+  cancel: Cancelar
+  confirm-exit: Confirmar Salida
+  sure-exit: ¿Está seguro de que desea salir de la encuesta?
+  submit-exit: Enviar y Salir
+  warning: Advertencia
+  required: Por favor, responda todas las preguntas obligatorias antes de continuar.
+  rating-title: Antes de irse...
+  rating-text: 'Califique su experiencia en la encuesta:'
+  rating-scale: de 1-malo a 5-excelente
+  previous: Anterior
+  next: Siguiente
+  exit: Salir
+  close-tab: Por favor, cierre esta pestaña manualmente para salir de la encuesta.
+  choose-option: Elige una opción
+  click: Haga clic aquí
+  redirect: Redireccionando en
+  seconds: segundos
+  new-tab: Se abre en una nueva pestaña
+  redirect-error: 'Error: Este texto no activará ninguna redirección...'

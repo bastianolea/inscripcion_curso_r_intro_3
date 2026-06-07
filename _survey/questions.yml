@@ -1,0 +1,120 @@
+# ! JUST READ - don't change the content of this file
+# Question structure extracted from survey.html
+nombre:
+  type: text
+  label: Nombre y apellido
+edad:
+  type: text
+  label: Edad
+genero:
+  type: mc
+  label: Género
+  options:
+    Femenino: femenino
+    No binario: no_binario
+    Masculino: masculino
+    Queer/agénero/otro: queer_ag_nero_otro
+    Prefiero no decirlo: prefiero_no_decirlo
+lgbt:
+  type: mc
+  label: ¿Te identificas con alguna orientación sexual, condición, o identidad de
+    género dentro del espectro LGBTIQ+ (lesbianas, gays, bisexuales, trans, intersex,
+    queer, asexuales, entre otros)?
+  options:
+    Sí: s
+    'No': 'no'
+    Prefiero no decirlo: prefiero_no_decirlo
+trans:
+  type: mc
+  label: ¿Eres una persona transgénero? (Transicionaste social y/o médicamente a un
+    género distinto al que naciste)
+  options:
+    Sí: s
+    'No': 'no'
+    Prefiero no decirlo: prefiero_no_decirlo
+pais:
+  type: select
+  label: ¿En qué país vives?
+  options:
+    Argentina: argentina
+    Bolivia: bolivia
+    Brasil: brasil
+    Chile: chile
+    Colombia: colombia
+    Costa Rica: costa_rica
+    Cuba: cuba
+    Ecuador: ecuador
+    El Salvador: el_salvador
+    Guatemala: guatemala
+    Honduras: honduras
+    México: m_xico
+    Nicaragua: nicaragua
+    Panamá: panam
+    Paraguay: paraguay
+    Perú: per
+    Puerto Rico: puerto_rico
+    República Dominicana: rep_blica_dominicana
+    Uruguay: uruguay
+    Venezuela: venezuela
+    España: espa_a
+    Otro: otro
+disca:
+  type: mc
+  label: ¿Te encuentras en situación de discapacidad?
+  options:
+    Sí, con credencial o pensión de invalidez: s_con_credencial_o_pensi_n_de_invalidez
+    Sí, sin credencial o pensión de invalidez: s_sin_credencial_o_pensi_n_de_invalidez
+    'No': 'no'
+    Prefiero no decirlo: prefiero_no_decirlo
+educacion:
+  type: mc_buttons
+  label: ¿Cuál es tu nivel educacional?
+  options:
+    Estudiante de educación universitaria: estudiante_de_educaci_n_universitaria
+    Educación universitaria completa: educaci_n_universitaria_completa
+    Estudiante de magíster: estudiante_de_mag_ster
+    Magíster: mag_ster
+    Estudiante de doctorado: estudiante_de_doctorado
+    Doctorado: doctorado
+areas:
+  type: mc_buttons
+  label: ¿A qué carrera o disciplina perteneces? (Elige la principal)
+  options:
+    Sociología: sociolog_a
+    Antropología: antropolog_a
+    Ciencia Política: ciencia_pol_tica
+    Geografía: geograf_a
+    Historia: historia
+    Derecho: derecho
+    Economía: econom_a
+    Literatura: literatura
+    Filosofía: filosof_a
+    Psicología: psicolog_a
+    Trabajo Social: trabajo_social
+    Educación: educaci_n
+    Comunicación: comunicaci_n
+    Artes: artes
+    Otra de ciencias sociales: otra_de_ciencias_sociales
+    Otra de humanidades: otra_de_humanidades
+    Otra que no es de ciencias sociales ni humanidades: otra_que_no_es_de_ciencias_sociales_ni_humanidades
+nivel_programacion:
+  type: mc_buttons
+  label: ¿Manejas algún lenguaje de programación?
+  options:
+    Sí, más de uno: s_m_s_de_uno
+    Sí, uno: s_uno
+    'No': 'no'
+nivel_r:
+  type: mc_buttons
+  label: ¿Cuál es tu nivel de conocimientos de R?
+  options:
+    Ninguno: ninguno
+    Principiante: principiante
+    Intermedio: intermedio
+    Avanzado: avanzado
+    Experto: experto
+    Lo vi en la universidad pero no entendí nada: lo_vi_en_la_universidad_pero_no_entend_nada
+correo:
+  type: text
+  label: Correo electrónico
+

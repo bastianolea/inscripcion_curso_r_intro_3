@@ -1,0 +1,12 @@
+name: inscripcion_curso_r_intro_3
+title: inscripcion_curso_r_intro_3
+username: bastianoleah
+account: bastianoleah
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 17476966
+bundleId: 12093615
+url: https://bastianoleah.shinyapps.io/inscripcion_curso_r_intro_3/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

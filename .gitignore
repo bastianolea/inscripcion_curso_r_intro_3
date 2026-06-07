@@ -1,0 +1,13 @@
+.env
+.Rproj.user
+.Rhistory
+.Rdata
+.httr-oauth
+.DS_Store
+.quarto
+.rsconnect
+cupos_especiales.txt
+seleccionados.R
+correos.txt
+.env
+.RData

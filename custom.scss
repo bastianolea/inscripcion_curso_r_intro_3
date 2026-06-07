@@ -1,0 +1,21 @@
+/*-- scss:defaults --*/
+$primary: #9069C0;
+
+/* color de título de la encuesta */
+h1 {
+  color: #8656AA !important;
+}
+
+p {
+  color: #543A73 !important;
+}
+
+/* cambiar color de fondo de la encuesta */
+body {
+  background-color: #F6F0FA !important;
+}
+
+/* cambiar color de la barra superior de avance */
+#progressbar {
+  background-color: #EADBEC !important;
+}
