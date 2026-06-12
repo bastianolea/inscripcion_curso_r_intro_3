@@ -7,7 +7,7 @@
 .quarto
 .rsconnect
 cupos_especiales.txt
-seleccionados.R
-correos.txt
 .env
 .RData
+cupos.rds
+correos.txt

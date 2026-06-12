@@ -28,14 +28,23 @@ resultados <- data |>
   arrange(time_end) |>
   # limpiar nombres
   mutate(nombre = str_squish(nombre)) |>
-  distinct(str_to_lower(nombre), .keep_all = TRUE) |>
+  distinct(nombre = str_to_lower(nombre), .keep_all = TRUE) |>
+  # validar correo
+  filter(str_detect(correo, "@.*\\.")) |> 
   # filtrar fecha de cierre
-  # filter(time_end <= lubridate::ymd_hms("2026-01-14 20:59:59")) |>
+  filter(time_end <= lubridate::ymd_hms("2026-06-12 12:59:59")) |>
   # limpiar respuestas
   mutate(across(
     where(is.character),
     ~ case_when(str_detect(.x, "^s$") ~ "sí", .default = .x)
   ))
+
+# exclusiones ----
+resultados <- resultados |> 
+  filter(nivel_programacion != "s_m_s_de_uno") |>
+  filter(areas != "otra_que_no_es_de_ciencias_sociales_o_humanidades") |>
+  filter(nivel_r != "intermedio", nivel_r != "avanzado") 
+
 
 
 # revisar datos ----
@@ -56,10 +65,12 @@ resultados |>
   arrange(desc(edad))
 
 resultados |> count(genero)
+resultados |> count(nivel_programacion)
 resultados |> count(nivel_r)
 resultados |> count(pais)
 resultados |> count(trans)
-resultados |> distinct(areas) |> print(n = Inf)
+resultados |> count(areas) |> print(n = Inf)
+
 
 # puntajes ----
 # crear puntajes de selección
@@ -74,37 +85,32 @@ resultados_p <- resultados |>
       puntaje
     ),
     puntaje = if_else(genero == "femenino", puntaje + 2, puntaje),
-    puntaje = if_else(lgbt == "sí", puntaje + 2, puntaje),
-    # puntaje = if_else(pais == "chile", puntaje + 2, puntaje),
+    puntaje = if_else(lgbt == "sí", puntaje + 3, puntaje),
+    puntaje = if_else(pais == "chile", puntaje + 2, puntaje),
     puntaje = if_else(
       disca == "s_con_credencial_o_pensi_n_de_invalidez",
-      puntaje + 3,
-      puntaje
-    ),
-    puntaje = if_else(
-      disca == "s_sin_credencial_o_pensi_n_de_invalidez",
       puntaje + 2,
       puntaje
     ),
     puntaje = if_else(
-      nivel_r == c("ninguno", "lo_vi_en_la_universidad_pero_no_entend_nada"),
+      disca == "s_sin_credencial_o_pensi_n_de_invalidez",
       puntaje + 1,
       puntaje
     )
   ) |>
   # penalizar grupos
   mutate(
-    puntaje = if_else(nivel_programacion == "sí", puntaje - 1, puntaje),
     puntaje = if_else(
-      nivel_r %in% c("principiante", "intermedio", "avanzado"),
-      puntaje - 1,
+      nivel_programacion == "sí", 
+      puntaje - 2, 
+      puntaje),
+    puntaje = if_else(
+      nivel_r %in% c("intermedio", "avanzado"),
+      puntaje - 2,
       puntaje
     )
   ) |>
   mutate(puntaje = if_else(puntaje <= 0, 1, puntaje)) |>
-  # criterios excluyentes
-  # filter(!str_detect(areas, "otra_que_no_es_de_ciencias_sociales_o_humanidades")) |>
-  filter(areas != "otra_que_no_es_de_ciencias_sociales_o_humanidades") |>
   # crear ranking de postulantes
   arrange(desc(puntaje)) |>
   mutate(id = row_number()) |>
@@ -124,13 +130,11 @@ resultados_p |> select(nombre, puntaje, id) |> tail()
 
 # separar personas trans, porque todxs tendrán cupo
 personas_trans <- resultados_p |>
-  filter(pais == "chile") |>
-  filter(trans != "no")
+  filter(trans == "sí")
 
-# excluir cupos trans y cupos especiales de la tabla de inscritos
+# excluir cupos trans de la tabla de inscritos
 resultados_p_2 <- resultados_p |>
-  filter(trans == "no") |>
-  filter(pais == "chile")
+  filter(trans != "sí")
 
 # cantidad de cupos disponibles
 n_cupos <- 150
@@ -150,43 +154,34 @@ seleccion <- sample(
 resultados_cupo <- resultados_p_2 |>
   filter(id %in% seleccion)
 
-resultados_cupo |> count(genero)
-resultados_cupo |> count(lgbt)
-resultados_cupo |> count(nivel_r)
-resultados_cupo |> count(nivel_programacion)
-resultados_cupo |> glimpse()
-
-
-# revisar seleccionados
-resultados_cupo |>
-  select(nombre, puntaje, pais, genero, disca, trans, lgbt) |>
-  print(n = Inf)
-
 # agregar personas trans y cupos especiales
-resultados_cupo_2 <- resultados_cupo |>
+resultados_cupo <- resultados_cupo |>
   bind_rows(personas_trans)
 
-
 # resultados ----
-resultados_cupo_2 |>
+resultados_cupo |>
   select(nombre, pais, genero, disca, trans, lgbt, puntaje) |>
   arrange(desc(puntaje)) |>
   print(n = Inf)
 
-resultados_cupo_2 |> count(genero)
-resultados_cupo_2 |> count(pais)
-resultados_cupo_2 |> count(nivel_r)
-resultados_cupo_2 |> count(educacion)
-mean(as.numeric(resultados_cupo_2$edad))
-resultados_cupo_2 |> count(pais, trans)
+resultados_cupo |> count(genero)
+resultados_cupo |> count(pais, sort = TRUE)
+resultados_cupo |> count(nivel_r)
+resultados_cupo |> count(educacion, sort = TRUE)
+resultados_cupo |> count(areas, sort = TRUE)
+mean(as.numeric(resultados_cupo$edad))
+resultados_cupo |> count(pais, trans) |> filter(trans == "sí")
 
-# correos
-resultados_cupo_2$correo |>
+# resultados_cupo |> filter(str_detect(nombre, ""))
+
+# correos ----
+resultados_cupo$correo |>
   paste(collapse = ", ") |>
+  # append(readLines("cupos_especiales.txt")) |> 
   clipr::write_clip()
 
 
-# anonimos
-resultados_cupo_2 |>
-  select(-nombre, -correo, -id) |>
-  readr::write_rds("datos/cupos.rds")
+# # anonimos
+# resultados_cupo |>
+#   select(-nombre, -correo, -puntaje) |>
+#   readr::write_rds("cupos.rds")
