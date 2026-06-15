@@ -1,0 +1,194 @@
+---
+title: "explorar"
+format: html
+---
+
+```{r}
+library(tidyverse)
+library(scales)
+
+cupos <- read_csv("datos/cupos.rds")
+postulaciones <- read_rds("datos/postulaciones.rds")
+
+postulaciones <- inscripciones |> 
+  select(any_of(names(cupos))) |> 
+  mutate(tipo = "postulaciones")
+
+cupos <- cupos |> 
+  select(-id) |> 
+  mutate(tipo = "inscritos/as")
+
+datos <- bind_rows(cupos, postulaciones) |> 
+    mutate(genero = recode_values(genero,
+                                "queer_ag_nero_otro" ~ "queer, agénero, otros",
+                                default = genero),
+         genero = str_replace(genero, "_", " ")
+  ) |> 
+  mutate(nivel_r = recode_values(nivel_r,
+                                 "lo_vi_en_la_universidad_pero_no_entend_nada" ~ "lo vi en la universidad,\npero no entendí nada",
+                                 default = nivel_r)
+  ) |> 
+  mutate(nivel_r = fct_relevel(nivel_r,
+                               "avanzado", "intermedio", "principiante", "ninguno")) |> 
+  mutate(areas = str_replace_all(areas, "_", " ")) |> 
+  mutate(areas = str_replace(areas, "g a", "gía"),
+         areas = str_replace(areas, "m a", "mía"),
+         areas = str_replace(areas, "f a", "fía"),
+         areas = str_replace(areas, "pol tica", "política"),
+         areas = str_replace(areas, "ci n", "ción"),
+         areas = str_wrap(areas, 30)) |> 
+  mutate(pais = recode_values(pais,
+                              "m_xico" ~ "méxico",
+                              "per" ~ "perú",
+                              "espa_a" ~ "españa",
+                              default = pais),
+         pais = str_to_title(pais))
+```
+
+```{r}
+# tema de colores
+theme_set(
+  theme_minimal(
+    base_family = "Atkinson Hyperlegible",
+    ink = "#553A74",
+    paper = "#EAD2FA",
+    accent = "#9069C0") +
+    theme(
+      panel.background = element_rect(fill = "#DFC7F0",
+                                      color = NA),
+      panel.grid = element_line(color = "#EAD2FA")
+      )
+)
+```
+
+
+```{r}
+datos |> 
+  count(genero, tipo) |> 
+  filter(genero %in% c("no binario", "femenino", "masculino")) |> 
+  group_by(tipo) |> 
+  mutate(p = n / sum(n)) |> 
+  ggplot() +
+  aes(p, genero, fill = tipo) +
+  geom_col(
+    position = position_dodge(),
+    width = .8,
+    color = "#EAD2FA", lwd = .6
+    ) +
+  geom_text(
+    aes(label = label_percent()(p)),
+    position = position_dodge(width = .7),
+    hjust = -0.2
+  ) +
+  scale_fill_manual(values = c("inscritos/as" = "#9069C0", "postulaciones" = "#BF9ED5")) +
+  scale_x_continuous(labels = scales::label_percent(),
+                     expand = expansion(c(0.06, 0.15)))  +
+  labs(y = "Género", x = NULL, fill = NULL) +
+  theme(axis.text.y = element_text(angle = 90, hjust = 0.5),
+        axis.title.y = element_text(margin = margin(r = 6)))
+```
+
+
+```{r}
+#| fig.height: 3
+#| fig.width: 8
+
+datos |> 
+  count(lgbt, tipo) |> 
+  filter_out(lgbt == "prefiero_no_decirlo") |> 
+  group_by(tipo) |> 
+  mutate(p = n / sum(n)) |> 
+  ggplot() +
+  aes(p, lgbt, fill = tipo) +
+  geom_col(
+    position = position_dodge(),
+    width = .7,
+    color = "#EAD2FA", lwd = .6
+    ) +
+  geom_text(
+    aes(label = label_percent()(p)),
+    position = position_dodge(width = .7),
+    hjust = -0.2
+  ) +
+  scale_fill_manual(values = c("inscritos/as" = "#9069C0", "postulaciones" = "#BF9ED5")) +
+  scale_x_continuous(labels = label_percent(),
+                     expand = expansion(c(0.06, 0.1))) +
+  labs(fill = NULL, y = "Personas LGBT+", x = NULL)
+```
+
+```{r}
+datos |> 
+  count(nivel_r, tipo) |> 
+  group_by(tipo) |> 
+  mutate(p = n / sum(n)) |> 
+  ungroup() |> 
+  ggplot() +
+  aes(n, nivel_r, fill = tipo) +
+  geom_col(
+    position = position_dodge(preserve = "single"),
+    width = .8,
+    color = "#EAD2FA", lwd = .6
+    ) +
+  scale_fill_manual(values = c("inscritos/as" = "#9069C0", "postulaciones" = "#BF9ED5"))
+```
+
+
+```{r}
+datos |> 
+  filter(tipo == "inscritos/as") |> 
+  count(areas, tipo) |> 
+  group_by(tipo) |> 
+  mutate(p = n / sum(n)) |> 
+  mutate(areas = fct_reorder(areas, p)) |> 
+  ggplot() +
+  aes(p, areas) +
+  geom_col(
+    width = .7,
+    color = "#EAD2FA", lwd = .6
+    ) +
+  scale_x_continuous(labels = scales::label_percent(),
+                     expand = expansion(c(0, 0.1))) +
+  labs(y = "Disciplinas", x = NULL)
+```
+
+```{r}
+datos |> 
+  mutate(edad = as.numeric(edad)) |> 
+  filter(tipo == "inscritos/as") |>
+  # count(areas, tipo) |> 
+  # group_by(tipo) |> 
+  # mutate(p = n / sum(n)) |> 
+  # mutate(areas = fct_reorder(areas, p)) |> 
+  ggplot() +
+  aes(edad) +
+  geom_density(
+    alpha = .7, 
+    fill = "#9069C0"
+    # width = .8,
+    # color = "#EAD2FA", lwd = .6
+    ) +
+  # coord_cartesian(expand = FALSE) +
+  scale_y_continuous(expand = expansion(c(0, 0.1))) +
+  scale_x_continuous(expand = expansion(c(0, 0))) +
+  theme(axis.text.y = element_blank()) +
+  labs(y = "Densidad", x = "Edades")
+```
+
+
+```{r}
+datos |> 
+  filter(tipo == "inscritos/as") |> 
+  mutate(pais = fct_lump_n(pais, n = 7, other_level = "Otros\npaíses")) |> 
+  count(pais) |> 
+  mutate(p = n / sum(n)) |> 
+  mutate(pais = fct_reorder(pais, p)) |> 
+  ggplot() +
+  aes(p, pais) +
+  geom_col(
+    width = .7,
+    color = "#EAD2FA", lwd = .6
+    ) +
+  scale_x_continuous(labels = scales::label_percent(),
+                     expand = expansion(c(0, 0.1))) +
+  labs(y = "Países", x = NULL)
+```

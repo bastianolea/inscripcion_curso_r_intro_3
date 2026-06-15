@@ -28,35 +28,41 @@ resultados <- data |>
   arrange(time_end) |>
   # limpiar nombres
   mutate(nombre = str_squish(nombre)) |>
-  distinct(nombre = str_to_lower(nombre), .keep_all = TRUE) |>
+  mutate(nombre = str_to_lower(nombre),
+         correo = str_to_lower(correo),
+         correo = str_remove_all(correo, " ")) |> 
+  distinct(nombre, .keep_all = TRUE) |>
   # validar correo
   filter(str_detect(correo, "@.*\\.")) |> 
   # filtrar fecha de cierre
-  filter(time_end <= lubridate::ymd_hms("2026-06-12 12:59:59")) |>
+  filter(time_end <= lubridate::ymd_hms("2026-06-14 00:00:00")) |>
   # limpiar respuestas
   mutate(across(
     where(is.character),
     ~ case_when(str_detect(.x, "^s$") ~ "sí", .default = .x)
   ))
 
+readr::write_rds(resultados |> select(-nombre, -correo), 
+                 "datos/postulaciones.rds")
+
 # exclusiones ----
 resultados <- resultados |> 
   filter(nivel_programacion != "s_m_s_de_uno") |>
-  filter(areas != "otra_que_no_es_de_ciencias_sociales_o_humanidades") |>
+  filter(areas != "otra_que_no_es_de_ciencias_sociales_ni_humanidades") |>
   filter(nivel_r != "intermedio", nivel_r != "avanzado") 
 
+# # buscar
+# resultados |> filter(str_detect(nombre, "sierra")) |> select(nombre, correo)
 
 
 # revisar datos ----
 resultados |> glimpse()
 
 resultados |>
-  select(nombre, genero, lgbt, trans, pais, disca) |>
-  print(n = 100)
+  select(nombre, genero, lgbt, trans, pais, disca)
 
 resultados |>
-  filter(pais == "chile") |>
-  print(n = 100)
+  filter(pais == "chile")
 
 resultados |>
   filter(trans == "sí")
@@ -84,9 +90,9 @@ resultados_p <- resultados |>
       puntaje + 2,
       puntaje
     ),
-    puntaje = if_else(genero == "femenino", puntaje + 2, puntaje),
-    puntaje = if_else(lgbt == "sí", puntaje + 3, puntaje),
-    puntaje = if_else(pais == "chile", puntaje + 2, puntaje),
+    puntaje = if_else(genero == "femenino", puntaje + 3, puntaje),
+    puntaje = if_else(lgbt == "sí", puntaje + 2, puntaje),
+    puntaje = if_else(pais == "chile", puntaje + 3, puntaje),
     puntaje = if_else(
       disca == "s_con_credencial_o_pensi_n_de_invalidez",
       puntaje + 2,
@@ -119,8 +125,7 @@ resultados_p <- resultados |>
 # revisar
 resultados_p |>
   # filter(pais == "chile") |>
-  select(nombre, pais, genero, disca, trans, lgbt, puntaje) |>
-  print(n = Inf)
+  select(nombre, pais, genero, disca, trans, lgbt, puntaje)
 
 resultados_p |> select(nombre, puntaje, id) |> head()
 resultados_p |> select(nombre, puntaje, id) |> tail()
@@ -132,31 +137,33 @@ resultados_p |> select(nombre, puntaje, id) |> tail()
 personas_trans <- resultados_p |>
   filter(trans == "sí")
 
-# excluir cupos trans de la tabla de inscritos
-resultados_p_2 <- resultados_p |>
-  filter(trans != "sí")
+# separar cupos especiales
+personas_cupo <- resultados_p |> 
+  filter(correo %in% readLines("cupos_especiales.txt"))
 
 # cantidad de cupos disponibles
-n_cupos <- 150
+n_cupos <- 160
 
 # # selección aleatoria sin probabilidad
-# seleccion <- sample(seq_len(nrow(resultados_p_2)), n_cupos)
+# seleccion <- sample(seq_len(nrow(resultados_p)), n_cupos)
 
 # selección aleatoria con probabilidad
 seleccion <- sample(
-  resultados_p_2$id,
+  resultados_p$id,
   size = n_cupos,
-  prob = resultados_p_2$puntaje,
+  prob = resultados_p$puntaje,
   replace = FALSE
 )
 
 # dejar seleccionadxs
-resultados_cupo <- resultados_p_2 |>
+resultados_cupo <- resultados_p |>
   filter(id %in% seleccion)
 
 # agregar personas trans y cupos especiales
 resultados_cupo <- resultados_cupo |>
-  bind_rows(personas_trans)
+  bind_rows(personas_trans) |> 
+  bind_rows(personas_cupo) |> 
+  distinct()
 
 # resultados ----
 resultados_cupo |>
@@ -172,16 +179,21 @@ resultados_cupo |> count(areas, sort = TRUE)
 mean(as.numeric(resultados_cupo$edad))
 resultados_cupo |> count(pais, trans) |> filter(trans == "sí")
 
-# resultados_cupo |> filter(str_detect(nombre, ""))
+# #
+# resultados_cupo |> filter(str_detect(correo, "katherine")) |> select(nombre, correo)
+resultados_cupo <- resultados_cupo |> 
+  mutate(correo = str_remove_all(correo, " "))
 
 # correos ----
 resultados_cupo$correo |>
   paste(collapse = ", ") |>
-  # append(readLines("cupos_especiales.txt")) |> 
   clipr::write_clip()
 
-
+# 
 # # anonimos
 # resultados_cupo |>
 #   select(-nombre, -correo, -puntaje) |>
-#   readr::write_rds("cupos.rds")
+#   readr::write_rds("datos/cupos.rds")
+
+# read_rds("datos/cupos.rds") |> 
+#   write_csv2("datos/cupos.rds")
